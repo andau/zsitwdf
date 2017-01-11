@@ -16,6 +16,7 @@ CLASS lcl_amc_test_text DEFINITION
   PRIVATE SECTION.
     METHODS: callBrfPlusWithSensorData
                importing pPcpFields type pcp_fields
+                         pBrfplusFunction type string
                returning value(pMaintenanceMessages) type ZT_MAINTENANCE_MESSAGES.
     DATA pcpFields type pcp_fields.
     DATA sensorValues type ref to ZCL_SENSOR_VALUES.
@@ -33,10 +34,11 @@ CLASS lcl_amc_test_text IMPLEMENTATION.
       TRY.
 
          i_message->get_fields( CHANGING c_fields = pcpFields ).
-         DATA(maintenanceMessages) = callBrfPlusWithSensorData( pcpFields ).
-
+         DATA(maintenanceMessages) = callBrfPlusWithSensorData(
+                exporting pPcpFields = pcpFields
+                          pBrfplusFunction = 'COFFEE_MACHINE_STATUS' ).
          if ( lines( maintenanceMessages ) = 0 ).
-              APPEND 'STATE OK' TO gt_message_list.
+              APPEND 'STATE OK - Take a coffee' TO gt_message_list.
          else.
               LOOP at maintenanceMessages assigning field-symbol(<maintenanceMessage>).
                 APPEND <maintenanceMessage> TO gt_message_list.
